@@ -37,7 +37,15 @@ public final class HonnyCompass extends JavaPlugin {
         this.getLogger().info("§d_  _ ____ _  _ _  _ _   _ ____ ____ _  _ ___  ____ ____ ____ ");
         this.getLogger().info("§d|__| |  | |\\ | |\\ |  \\_/  |    |  | |\\/| |__] |__| [__  [__  ");
         this.getLogger().info("§d|  | |__| | \\| | \\|   |   |___ |__| |  | |    |  | ___] ___] ");
+        this.getLogger().info("§d_  _ ____ _  _ _  _ _   _ ____ ____ _  _ ___  ____ ____ ____ ");
+        this.getLogger().info("§d   Update 1.21.x by jpx1209 :                                                          ");
+        this.getLogger().info("§d     _____             ____  _       _       _____                                                                      ");
+        this.getLogger().info("§d      |_   _|_ _  ___   / ___|(_)_ __ | |__   |_   _|__  _                                                        ");
+        this.getLogger().info("§d        | |/ _` |/ _ \\  \\___ \\| | '_ \\| '_ \\    | |/ _ \\| '_ \\                                                          ");
+        this.getLogger().info("§d        | | (_| | (_) |  ___) | | | | | | | |   | | (_) | | | |                                                         ");
+        this.getLogger().info("§d        |_|\\__,_|\\___/  |____/|_|_| |_|_| |_|   |_|\\___/|_| |_|                                                         ");
         this.getLogger().info("§d                                                             ");
+
 
         Objects.requireNonNull(this.getCommand("honnycompass")).setExecutor(new CommandsHandler());
         Objects.requireNonNull(this.getCommand("honnycompass")).setTabCompleter(new CommandsComplete());

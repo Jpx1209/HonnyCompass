@@ -6,7 +6,6 @@ import honny.dependings.betonquest.CompassLocations;
 import honny.utils.AngleUtil;
 import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
@@ -140,7 +139,7 @@ public class PlayerCompass {
             end = String.format(mainConfig.getPostfixFormatString(), line);
         }
 
-        String compass = start + mainConfig.getSymbolStart() + StringUtils.join(this.compassList, "") + mainConfig.getSymbolEnd() + end;
+        String compass = start + mainConfig.getSymbolStart() + String.join("", this.compassList) + mainConfig.getSymbolEnd() + end;
         bossBarCompass.setTitle(compass);
 
         if (targetName != null) {
