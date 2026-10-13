@@ -1,6 +1,5 @@
 honny\commands\CommandsComplete.class
 honny\utils\AngleUtil.class
-honny\handlers\QuestCompassTargetChangeHandler.class
 honny\MainConfigManager.class
 honny\dependings\betonquest\CompassLocations.class
 honny\HonnyCompass.class

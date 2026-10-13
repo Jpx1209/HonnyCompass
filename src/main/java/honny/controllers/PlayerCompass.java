@@ -29,7 +29,6 @@ public class PlayerCompass {
         bossBarMessage.addPlayer(player);
         bossBarMessage.setVisible(false);
 
-        this.update(player);
     }
 
     public void deleteBossBar() {
@@ -67,6 +66,18 @@ public class PlayerCompass {
         double distance = 0;
 
         if (instance.getOptionalBetonQuest().isPresent()) {
+
+            double minDistance = Double.MAX_VALUE;
+            this.targetLocation = null;
+            for (CompassLocations.CompassLocation cl : getCompassLocations(player)) {
+                if (player.getLocation().getWorld() != null && player.getLocation().getWorld().equals(cl.location.getWorld())) {
+                    double dist = player.getLocation().distance(cl.location);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        this.targetLocation = cl.location;
+                    }
+                }
+            }
             for (CompassLocations.CompassLocation compassLocation : getCompassLocations(player)) {
 
                 if (player.getLocation().getWorld() != null) {
