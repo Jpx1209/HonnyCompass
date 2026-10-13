@@ -20,6 +20,9 @@ public class PlayerCompass {
     private final BossBar bossBarMessage;
     @Setter private Location targetLocation;
 
+    List<String> compassList;
+    List<CompassLocations.CompassLocation> compassLocations = null;
+
     public PlayerCompass(Player player) {
         MainConfigManager mainConfig = HonnyCompass.getInstance().getMainConfig();
         bossBarCompass = Bukkit.createBossBar("", mainConfig.getBarColor(), mainConfig.getBarStyle());
@@ -28,16 +31,12 @@ public class PlayerCompass {
         bossBarMessage = Bukkit.createBossBar("", mainConfig.getBarColor(), mainConfig.getBarStyle());
         bossBarMessage.addPlayer(player);
         bossBarMessage.setVisible(false);
-
     }
 
     public void deleteBossBar() {
         bossBarCompass.removeAll();
         bossBarMessage.removeAll();
     }
-
-    List<String> compassList;
-    List<CompassLocations.CompassLocation> compassLocations = null;
 
     public void updateCompassLocations(Player player) {
         this.compassLocations = HonnyCompass.getInstance().getCompassLocations().getLocations(player);
@@ -52,10 +51,7 @@ public class PlayerCompass {
         HonnyCompass instance = HonnyCompass.getInstance();
         MainConfigManager mainConfig = instance.getMainConfig();
 
-        // All compass is 20 + 40 + 20 sections length
-        int yawPerSection = 9; // 360 / 40 = 9
-
-        // integer division; 2 / 9 = 0
+        int yawPerSection = 9;
         double yaw = player.getLocation().getYaw();
         if (yaw < 0) yaw += 360;
         int currentYaw = ((int) yaw / yawPerSection) + 20;
@@ -67,24 +63,25 @@ public class PlayerCompass {
 
         if (instance.getOptionalBetonQuest().isPresent()) {
 
-            double minDistance = Double.MAX_VALUE;
+            Location vanillaTarget = player.getCompassTarget();
             this.targetLocation = null;
-            for (CompassLocations.CompassLocation cl : getCompassLocations(player)) {
-                if (player.getLocation().getWorld() != null && player.getLocation().getWorld().equals(cl.location.getWorld())) {
-                    double dist = player.getLocation().distance(cl.location);
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        this.targetLocation = cl.location;
+
+            if (vanillaTarget != null) {
+                for (CompassLocations.CompassLocation cl : getCompassLocations(player)) {
+                    if (cl.location.getWorld() != null && cl.location.getWorld().equals(vanillaTarget.getWorld())) {
+                        if (cl.location.distance(vanillaTarget) < 3.0) {
+                            this.targetLocation = cl.location;
+                            break;
+                        }
                     }
                 }
             }
-            for (CompassLocations.CompassLocation compassLocation : getCompassLocations(player)) {
 
+            for (CompassLocations.CompassLocation compassLocation : getCompassLocations(player)) {
                 if (player.getLocation().getWorld() != null) {
                     if (!player.getLocation().getWorld().equals(compassLocation.location.getWorld())) continue;
 
                     int pointYaw = AngleUtil.computeAngle(player, compassLocation.location) / yawPerSection + 20;
-
                     boolean selected = this.targetLocation != null && this.targetLocation.equals(compassLocation.location);
 
                     if (pointYaw == currentYaw) {
@@ -95,39 +92,26 @@ public class PlayerCompass {
 
                     String point;
                     if (selected) {
-                        // below
                         if (player.getLocation().getY() - compassLocation.location.getY() > mainConfig.getYDifferenceIcons()) {
                             point = pointYaw == currentYaw ? mainConfig.getSelectedCompassTargetSelectedBelow() : mainConfig.getSelectedCompassTargetBelow();
-                        }
-                        // above
-                        else if (compassLocation.location.getY() - player.getLocation().getY() > mainConfig.getYDifferenceIcons()) {
+                        } else if (compassLocation.location.getY() - player.getLocation().getY() > mainConfig.getYDifferenceIcons()) {
                             point = pointYaw == currentYaw ? mainConfig.getSelectedCompassTargetSelectedAbove() : mainConfig.getSelectedCompassTargetAbove();
-                        }
-                        // at player level
-                        else {
+                        } else {
                             point = pointYaw == currentYaw ? mainConfig.getSelectedCompassTargetSelected() : mainConfig.getSelectedCompassTarget();
                         }
-                    }
-                    else {
-                        // below
+                    } else {
                         if (player.getLocation().getY() - compassLocation.location.getY() > mainConfig.getYDifferenceIcons()) {
                             point = pointYaw == currentYaw ? mainConfig.getCompassTargetSelectedBelow() : mainConfig.getCompassTargetBelow();
-                        }
-                        // above
-                        else if (compassLocation.location.getY() - player.getLocation().getY() > mainConfig.getYDifferenceIcons()) {
+                        } else if (compassLocation.location.getY() - player.getLocation().getY() > mainConfig.getYDifferenceIcons()) {
                             point = pointYaw == currentYaw ? mainConfig.getCompassTargetSelectedAbove() : mainConfig.getCompassTargetAbove();
-                        }
-                        // at player level
-                        else {
+                        } else {
                             point = pointYaw == currentYaw ? mainConfig.getCompassTargetSelected() : mainConfig.getCompassTarget();
                         }
                     }
 
                     this.compassList.set(pointYaw, point);
-                    if (pointYaw > 40)
-                        this.compassList.set(pointYaw - 40, point);
-                    if (pointYaw < 40)
-                        this.compassList.set(pointYaw + 40, point);
+                    if (pointYaw > 40) this.compassList.set(pointYaw - 40, point);
+                    if (pointYaw < 40) this.compassList.set(pointYaw + 40, point);
                 }
             }
         }
@@ -155,17 +139,9 @@ public class PlayerCompass {
 
         if (targetName != null) {
             if (targetSelected)
-                bossBarMessage.setTitle(mainConfig.getTitleMessageSelected().replace(
-                        "{name}", targetName
-                ).replace(
-                        "{distance}", Double.toString(Math.round(distance))
-                ));
+                bossBarMessage.setTitle(mainConfig.getTitleMessageSelected().replace("{name}", targetName).replace("{distance}", Double.toString(Math.round(distance))));
             else
-                bossBarMessage.setTitle(mainConfig.getTitleMessage().replace(
-                        "{name}", targetName
-                ).replace(
-                        "{distance}", Double.toString(Math.round(distance))
-                ));
+                bossBarMessage.setTitle(mainConfig.getTitleMessage().replace("{name}", targetName).replace("{distance}", Double.toString(Math.round(distance))));
             bossBarMessage.setVisible(true);
         } else {
             bossBarMessage.setVisible(false);

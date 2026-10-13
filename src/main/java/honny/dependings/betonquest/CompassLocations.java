@@ -7,7 +7,6 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import me.clip.placeholderapi.PlaceholderAPI;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -67,7 +66,8 @@ public class CompassLocations {
                         final int locY = Integer.parseInt(parts[1]);
                         final int locZ = Integer.parseInt(parts[2]);
                         final Location loc = new Location(world, locX, locY, locZ);
-                        String bqKey = packName + ".compass-" + key;
+
+                        String bqKey = packName + ";" + key;
                         this.locations.put(bqKey, new CompassLocation(loc, name));
                     } catch (final NumberFormatException ignored) {}
                 }
@@ -89,10 +89,16 @@ public class CompassLocations {
 
     public List<CompassLocation> getLocations(Player player) {
         List<CompassLocation> compassLocations = new ArrayList<>();
-        for (Map.Entry<String, CompassLocation> entry : this.locations.entrySet()) {
-            String hasTag = PlaceholderAPI.setPlaceholders(player, "%betonquest_tag:" + entry.getKey() + "%");
-            if ("yes".equalsIgnoreCase(hasTag) || "true".equalsIgnoreCase(hasTag)) {
-                compassLocations.add(entry.getValue());
+
+        Location vanillaTarget = player.getCompassTarget();
+
+        if (vanillaTarget != null) {
+            for (CompassLocation cl : this.locations.values()) {
+                if (cl.location.getWorld() != null && cl.location.getWorld().equals(vanillaTarget.getWorld())) {
+                    if (cl.location.distance(vanillaTarget) < 3.0) {
+                        compassLocations.add(cl);
+                    }
+                }
             }
         }
         return compassLocations;
